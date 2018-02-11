@@ -35,4 +35,4 @@ Here is how it works:
 R package dependencies (which are auto-installed): scales, reshape, ggplot2, plotly,  htmlwidgets, XML, DMwR
 Supports R versions: R 3.4.1, R 3.3.3, R 3.3.2, MRO 3.2.2 
 
-This is an open source visual. Get the code from GitHub: https://github.com/Microsoft/powerbi-visuals-outliers
+This is an open source visual. Get the code from GitHub: https://github.com/Microsoft/powerbi-visuals-outliers-det
