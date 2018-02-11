@@ -1,0 +1,596 @@
+{
+  "dataRoles": [
+   {
+      "displayName": "ID",
+      "description": "Unique identifier, used to force the order of rows and prevent removal of identical rows(optional)",
+      "kind": "GroupingOrMeasure",
+      "name": "ID"
+    },
+	{
+      "displayName": "Variables",
+      "description": "Only numerical fields are allowed. Two or more columns are transformed to 1st principle component (except for LOF method)",
+      "kind": "GroupingOrMeasure",
+      "name": "Values"
+    }, 
+	{
+      "displayName": "Independent Variables",
+      "description": "Numerical field. Used only with Cooks Distance method ",
+      "kind": "GroupingOrMeasure",
+      "name": "IndepVar"
+    }, 
+	{
+      "displayName": "Tooltips",
+      "kind": "GroupingOrMeasure",
+      "description": "Fields to be used as mouseover tooltips",
+      "name": "Tooltips"
+    }
+  ],
+  "dataViewMappings": [
+    {
+	"conditions": [
+        {
+          "Values": {
+            "max": 10
+          },
+          "ID": {
+            "max": 1
+          },
+		   "IndepVar": {
+            "max": 10
+          },
+		   "Tooltips": {
+            "max": 5
+          }
+        }
+      ],
+      "scriptResult": {
+        "dataInput": {
+          "table": {
+            "rows": {
+              "select": [
+                {
+                  "for": {
+                    "in": "Values"
+                  }
+                },
+				{
+                  "for": {
+                    "in": "ID"
+                  }
+                },
+				{
+                  "for": {
+                    "in": "IndepVar"
+                  }
+                },
+				{
+                  "for": {
+                    "in": "Tooltips"
+                  }
+                }
+              ],
+              "dataReductionAlgorithm": {
+                "top": {}
+              }
+            }
+          }
+        },
+        "script": {
+          "scriptProviderDefault": "R",
+          "scriptOutputType": "html",
+          "source": {
+            "objectName": "rcv_script",
+            "propertyName": "source"
+          },
+          "provider": {
+            "objectName": "rcv_script",
+            "propertyName": "provider"
+          }
+        }
+      }
+    }
+  ],
+  "objects": {
+    "rcv_script": {
+      "properties": {
+        "provider": {
+          "type": {
+            "text": true
+          }
+        },
+        "source": {
+          "type": {
+            "scripting": {
+              "source": true
+            }
+          }
+        }
+      }
+    },
+    "mySettingsDet": {
+      "displayName": "Detection",
+      "description": "Algorithms for outlier detection and their parameters",
+      "properties": {
+          "thresholdType": {
+        "displayName": "Outlier type",
+        "description": "Outlier type. Peaks are values above the average, subpeaks are values below average",
+        "type": {
+          "enumeration": [
+            {
+              "displayName": "peaks and subpeaks",
+              "value": "PeaksAndSubpeaks"
+            },
+            {
+              "displayName": "subpeaks",
+              "value": "Subpeaks"
+            },
+            {
+              "displayName": "peaks",
+              "value": "Peaks"
+            }
+          ]
+        }
+      }, 
+      "algName": {
+        "displayName": "Algorithm",
+        "description": "Select the method for outlier's detection. 'zscore' = threshold applied on standardized value, 'Tukey' = threshold applied on IQR-scaled value (IQR is a interquartile range), 'LOF'(Local Outlier Factor) = result is based on local density, 'manual' = lower and upper thresholds defined by user, 'coots' =  outlier score is a measure computed with respect to a regression model ",
+        "type": {
+          "enumeration": [
+            {
+              "displayName": "manual",
+              "value": "manual"
+            },
+            {
+              "displayName": "zscore",
+              "value": "zscore"
+            },
+            {
+              "displayName": "tukey",
+              "value": "Tukey"
+            },
+            {
+              "displayName": "LOF",
+              "value": "LOF"
+            },
+            {
+              "displayName": "Cook's distance",
+              "value": "cooks"
+            }
+          ]
+        }
+      },
+  "numSig": {
+        "displayName": "num sigmas",
+        "description": "Threshold for zscore",
+        "type": {
+          "enumeration": [
+            {
+              "displayName": "2",
+              "value": "2"
+            },
+            {
+              "displayName": "2.5",
+              "value": "2.5"
+            },
+            {
+              "displayName": "3",
+              "value": "3"
+            },
+            {
+              "displayName": "3.5",
+              "value": "3.5"
+            },
+            {
+              "displayName": "4",
+              "value": "4"
+            },
+            {
+              "displayName": "5",
+              "value": "5"
+            },
+            {
+              "displayName": "7",
+              "value": "7"
+            },
+            {
+              "displayName": "10",
+              "value": "10"
+            },
+            {
+              "displayName": "20",
+              "value": "20"
+            }
+          ]
+        }
+      },
+  "IQR": {
+        "displayName": "IQR",
+        "description": "Threshold in terms of interquartile range",
+        "type": {
+          "enumeration": [
+            {
+              "displayName": "1.25",
+              "value": "1.25"
+            },
+            {
+              "displayName": "1.5",
+              "value": "1.5"
+            },
+            {
+              "displayName": "1.75",
+              "value": "1.75"
+            },
+            {
+              "displayName": "2",
+              "value": "2"
+            },
+            {
+              "displayName": "2.5",
+              "value": "2.5"
+            },
+            {
+              "displayName": "3",
+              "value": "3"
+            },
+            {
+              "displayName": "5",
+              "value": "5"
+            },
+            {
+              "displayName": "7",
+              "value": "7"
+            },
+            {
+              "displayName": "10",
+              "value": "10"
+            }
+          ]
+        }
+      },
+  "LOFThresh": {
+        "displayName": "threshold",
+        "description": "LOF threshold",
+        "type": {
+          "enumeration": [
+            {
+              "displayName": "2",
+              "value": "2"
+            },
+            {
+              "displayName": "2.5",
+              "value": "2.5"
+            },
+            {
+              "displayName": "3",
+              "value": "3"
+            },
+            {
+              "displayName": "3.5",
+              "value": "3.5"
+            },
+            {
+              "displayName": "4",
+              "value": "4"
+            },
+            {
+              "displayName": "5",
+              "value": "5"
+            },
+            {
+              "displayName": "7",
+              "value": "7"
+            },
+            {
+              "displayName": "10",
+              "value": "10"
+            },
+            {
+              "displayName": "20",
+              "value": "20"
+            }
+          ]
+        }
+      },
+  "LOFK": {
+            "displayName": "neighborhood cardinality",
+            "description": "Number of neighbors that will be used in the calculation of the local outlier factors",
+            "type": {
+              "enumeration": [
+                {
+                  "displayName": "1",
+                  "value": "1"
+                },
+                {
+                  "displayName": "2",
+                  "value": "2"
+                },
+                {
+                  "displayName": "3",
+                  "value": "3"
+                },
+                {
+                  "displayName": "4",
+                  "value": "4"
+                },
+                {
+                  "displayName": "5",
+                  "value": "5"
+                },
+                {
+                  "displayName": "7",
+                  "value": "7"
+                },
+                {
+                  "displayName": "10",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+  "lThresh": {
+        "displayName": "lower threshold",
+        "description": "Lower threshold", 
+        "type": {
+          "numeric": true
+        }
+      },
+  "hThresh": {
+        "displayName": "upper threshold",
+        "description": "Upper threshold",
+        "type": {
+          "numeric": true
+        }
+      },
+  "cooksThresh": {
+            "displayName": "threshold",
+            "description": "Cook's distance threshold, with respect to average Cook's distance",
+            "type": {
+              "enumeration": [
+                {
+                  "displayName": "2",
+                  "value": "2"
+                },
+                {
+                  "displayName": "2.5",
+                  "value": "2.5"
+                },
+                {
+                  "displayName": "3",
+                  "value": "3"
+                },
+                {
+                  "displayName": "3.5",
+                  "value": "3.5"
+                },
+                {
+                  "displayName": "5",
+                  "value": "5"
+                },
+                {
+                  "displayName": "7",
+                  "value": "7"
+                },
+                {
+                  "displayName": "10",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+  "toScale": {
+            "displayName": "scale (if applicable)",
+            "description": "Standardization is applied to multivariate fields (if applicable)",
+            "type": {
+              "bool": true
+            }
+          }
+  
+        }
+      },
+    "mySettingsViz": {
+      "displayName": "Visualization",
+      "properties": {
+        "plotType": {
+          "displayName": "Plot type",
+          "description": "Plot type",
+          "type": {
+            "enumeration": [
+              {
+                "displayName": "scatter",
+                "value": "scatter"
+              },
+              {
+                "displayName": "boxplot",
+                "value": "boxplot"
+              },
+              {
+                "displayName": "density",
+                "value": "density"
+              }
+            ]
+          }
+        },
+        
+        "afterTransform": {
+          "displayName": "After transform ",
+          "description": "Show after transform",
+          "type": {
+            "bool": true
+          }
+        },
+        "visualizeOutlierScore": {
+          "displayName": "Visualize outlier's score",
+          "description": "Visualize outlier's score instead of original data values",
+          "type": {
+            "bool": true
+          }
+        }
+       
+        }
+      }, 
+      "mySettingsMark": {
+        "displayName": "Markers",
+        "description": "Point marker settings",
+        "properties": {
+          "inlierColor": {
+            "displayName": "Inliers color",
+            "description": "Inliers color",
+            "type": {
+              "fill": {
+                "solid": {
+                  "color": true
+                }
+              }
+            }
+          },
+          "outlierColor": {
+            "displayName": "Outliers color",
+            "description": "Outliers color",
+            "type": {
+              "fill": {
+                "solid": {
+                  "color": true
+                }
+              }
+            }
+          }, 
+          "weight": {
+            "displayName": "Point size",
+            "type": {
+              "numeric": true
+            }
+          },
+          "percentile": {
+            "displayName": "Opacity",
+            "description": "Point Opacity",
+            "type": {
+              "numeric": true
+            }
+          },
+          "sparsify": {
+            "displayName": "Sparsify",
+            "description": "Sparsify (make more sparse) dense regions of the scatter plot. Recommended for overcoming any overdrawing or memory issues.",
+            "type": {
+              "bool": true
+            }
+          }
+        }
+      },
+      "mySettingsAxes": {
+        "displayName": "Axes",
+        "description": "Axes and labels settings",
+        "properties": {
+          "colLabel": {
+            "displayName": "Labels color",
+            "description": "Labels color",
+            "type": {
+              "fill": {
+                "solid": {
+                  "color": true
+                }
+              }
+            }
+          },
+          "textSize": {
+            "displayName": "Labels size",
+            "type": {
+              "numeric": true
+            }
+          },
+          "scaleXformat": {
+            "displayName": "Scale X format",
+            "description": "Scale X format",
+            "type": {
+              "enumeration": [
+                {
+                  "displayName": "none",
+                  "value": "none"
+                },
+                {
+                  "displayName": "comma",
+                  "value": "comma"
+                },
+                {
+                  "displayName": "scientific",
+                  "value": "scientific"
+                },
+                {
+                  "displayName": "dollar",
+                  "value": "dollar"
+                }
+              ]
+            }
+          },
+          "scaleYformat": {
+            "displayName": "Scale Y format",
+            "description": "Scale Y format",
+            "type": {
+              "enumeration": [
+                {
+                  "displayName": "none",
+                  "value": "none"
+                },
+                {
+                  "displayName": "comma",
+                  "value": "comma"
+                },
+                {
+                  "displayName": "scientific",
+                  "value": "scientific"
+                },
+                {
+                  "displayName": "dollar",
+                  "value": "dollar"
+                }
+              ]
+            }
+          },
+          "sizeTicks": {
+            "displayName": "Size ticks",
+            "description": "Size ticks",
+            "type": {
+              "enumeration": [
+                {
+                  "displayName": "4",
+                  "value": "4"
+                },
+                {
+                  "displayName": "6",
+                  "value": "6"
+                },
+                {
+                  "displayName": "8",
+                  "value": "8"
+                },
+                {
+                  "displayName": "10",
+                  "value": "10"
+                },
+                {
+                  "displayName": "12",
+                  "value": "12"
+                },
+                {
+                  "displayName": "14",
+                  "value": "14"
+                },
+                {
+                  "displayName": "16",
+                  "value": "16"
+                },
+                {
+                  "displayName": "18",
+                  "value": "18"
+                },
+                {
+                  "displayName": "20",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      }  
+  },
+  "suppressDefaultTitle": true
+}
