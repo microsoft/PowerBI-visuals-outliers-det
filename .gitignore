@@ -78,7 +78,7 @@ dist/*
 *_testing.pbix
 assets\*.pdn
 out.html
-
+.Rhistory
 
 
 
