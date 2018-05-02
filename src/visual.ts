@@ -235,7 +235,6 @@ module powerbi.extensibility.visual {
                         properties: {
                             plotType: se.mySettingsViz.plotType,
                             visualizeOutlierScore: se.mySettingsViz.visualizeOutlierScore
-
                         },
                         selector: null
                     });

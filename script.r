@@ -11,17 +11,6 @@
 # Microsoft grants you no license rights for third-party software or applications that is obtained using this software.
 
 
-#TEMP: Debug in RStudio
-fileRda = "C:/Users/boefraty/projects/PBI/R/tempData1.Rda"
-if(file.exists(dirname(fileRda)))
-{
-  if(Sys.getenv("RSTUDIO")!="")
-    load(file= fileRda)
-  else
-    save(list = ls(all.names = TRUE), file=fileRda)
-}
-
-
 ############ User Parameters #########
 # Set of parameters from GUI
 # comments on params and functions

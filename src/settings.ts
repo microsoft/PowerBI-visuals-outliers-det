@@ -54,7 +54,6 @@ module powerbi.extensibility.visual {
 
   export class mySettingsViz {
     public plotType: string = "scatter";
-    // public afterTransform: boolean = false;
     public visualizeOutlierScore: boolean = false;
   }
   export class mySettingsMark {
