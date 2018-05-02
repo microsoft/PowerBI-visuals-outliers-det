@@ -12,17 +12,14 @@
 
 
 #TEMP: Debug in RStudio
-# fileRda = "C:/Users/boefraty/projects/PBI/R/tempData.Rda"
-# if(file.exists(dirname(fileRda)))
-# {
-#   if(Sys.getenv("RSTUDIO")!="")
-#     load(file= fileRda)
-#   else
-#     save(list = ls(all.names = TRUE), file=fileRda)
-# }
-
-
-
+fileRda = "C:/Users/boefraty/projects/PBI/R/tempData1.Rda"
+if(file.exists(dirname(fileRda)))
+{
+  if(Sys.getenv("RSTUDIO")!="")
+    load(file= fileRda)
+  else
+    save(list = ls(all.names = TRUE), file=fileRda)
+}
 
 
 ############ User Parameters #########
@@ -190,6 +187,23 @@ if(exists("mySettingsDet_toScale")){
   toScale = mySettingsDet_toScale
 }
 
+##PBI_PARAM: export out data to HTML?
+#Type:logical, Default:FALSE, Range:NA, PossibleValues:NA, Remarks: NA
+keepOutData = FALSE
+if(exists("settings_export_params_show"))
+  keepOutData = settings_export_params_show 
+
+##PBI_PARAM: method of export interface
+#Type: string , Default:"copy",  Range:NA, PossibleValues:"copy", "download",  Remarks: NA
+exportMethod = "copy"
+if(exists("settings_export_params_method"))
+  exportMethod = settings_export_params_method 
+
+##PBI_PARAM: limit the out table exported
+#Type: string , Default:1000,  Range:NA, PossibleValues:"1000", "10000", Inf,  Remarks: NA
+limitExportSize = 1000
+if(exists("settings_export_params_limitExportSize"))
+  limitExportSize = as.numeric(settings_export_params_limitExportSize)
 
 ###############Internal parameters definitions#################
 # Set of parameters, which are not exported to GUI (yet)
@@ -202,6 +216,7 @@ SMALL_EPSILON = 0.000001
 
 maxRows = 95000 # randomly remove extra rows
 maxRowsLOF = 6500 # randomly remove extra rows
+yRangeExtend = 1.055
 
 options(warn=-1)
 ###############Library Declarations###############
@@ -214,6 +229,7 @@ libraryRequireInstall("ggplot2");
 libraryRequireInstall("plotly")
 libraryRequireInstall("DMwR")
 libraryRequireInstall("scales")
+libraryRequireInstall("caTools")
 
 ###############Internal functions definitions#################
 
@@ -281,10 +297,10 @@ RemoveExtraRows = function(Values,ID, IndepVar , Tooltips, algName, params)
     if(!is.null(Tooltips))
       Tooltips = Tooltips[ii, , drop=FALSE]
   }  
-    
-    return(list(Values = Values,ID = ID, IndepVar = IndepVar , Tooltips = Tooltips))
-    
-    
+  
+  return(list(Values = Values,ID = ID, IndepVar = IndepVar , Tooltips = Tooltips))
+  
+  
 }
 
 
@@ -322,10 +338,16 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
       if(!is.null(ID))
         ID = subset(ID,goodRows)
       
+      if(!is.null(Values))
+        Values = subset(Values,goodRows)
+      
+      if(!is.null(IndepVar))
+        IndepVar = subset(IndepVar,goodRows)
+      
     }
   }
   
-
+  
   #check for errors
   Errors = CheckInputForErrors(XX, YY, algName, params)
   if(is.null(Errors))
@@ -343,6 +365,10 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
         YY[,] = YY[ord,]
       if(!is.null(TT))
         TT[,] = TT[ord,]
+      if(!is.null(Values))
+        Values[,] = Values[ord,]
+      if(!is.null(IndepVar))
+        IndepVar[,] = IndepVar[ord,]
       
       ID[,1] = ID[ord,1]
     }
@@ -390,7 +416,7 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
   }
   
   #result in list
-  res = list(XX= XX, YY = YY, TT = TT, Errors = Errors, Values = XX,ID = ID, IndepVar = YY, Tooltips = TT)
+  res = list(XX= XX, YY = YY, TT = TT, Errors = Errors, Values = Values,ID = ID, IndepVar = IndepVar, Tooltips = TT)
   return(res) 
   
 }
@@ -636,7 +662,71 @@ scaleXYformat = function (scaleType, XorY, fp)
   
 }
 
+#label format: hAxis.format scientific, dollar , comma
+GetGooFormat = function(scaleFormat)
+{
+  mapFormat = c('','scientific','currency', 'decimal')
+  names(mapFormat) = c('none','scientific','dollar', 'comma')
+  return(mapFormat[scaleFormat])
+}
 
+ConvertDF64encoding = function (df, withoutEncoding = FALSE)
+{
+  header_row <- paste(names(df), collapse=", ")
+  tab <- apply(df, 1, function(x)paste(x, collapse=", "))
+  
+  if(withoutEncoding){
+    text <- paste(c(header_row, tab), collapse="\n")
+    x <- text
+  }
+  else
+  {
+    text <- paste(c(header_row, tab), collapse="\n")
+    x <- caTools::base64encode(text)
+  }
+  return(x)
+}
+
+
+KeepOutDataInHTML = function(df, htmlFile = 'out.html', exportMethod = "copy", limitExportSize = 1000)
+{
+  if(!is.null(df) && nrow(df)>limitExportSize)
+    df = df[1:limitExportSize,]
+  
+  outDataString64 = ConvertDF64encoding(df)
+  
+  linkElem = '\n<a href=""  download="data.csv"  style="position: absolute; top:0px; left: 0px; z-index: 20000;" id = "mydataURL">export</a>\n'
+  updateLinkElem = paste('<script>\n link_element = document.getElementById("mydataURL");link_element.href = outDataString64href;', '\n</script> ', sep =' ')
+  var64 = paste('<script> outDataString64 ="', outDataString64, '"; </script>', sep ="")
+  var64href = paste('<script> outDataString64href ="data:;base64,', outDataString64, '"; </script>', sep ="")
+  
+  buttonElem = '<button style="position: absolute; top:0px; left: 0px; z-index: 20000;"  onclick="myFunctionCopy(1)">copy to clipboard</button>'
+  funcScript = '<script> 
+  function myFunctionCopy(is64) 
+  {
+  const el = document.createElement("textarea");
+  if(is64)
+  {
+  el.value = atob(outDataString64);
+  }
+  else
+  {
+  el.value = outDataStringPlane;
+  }
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);};	
+  </script>'
+  
+  if(exportMethod == "copy")
+    endOfBody = paste(var64,funcScript, buttonElem,'\n</body>',sep ="")
+  else#"download"
+    endOfBody = paste(linkElem,var64, var64href,updateLinkElem,'\n</body>',sep ="")
+  
+  ReadFullFileReplaceString('out.html', 'out.html', '</body>', endOfBody)
+  
+}
 
 ############# Input validation & initializations ############# 
 
@@ -783,7 +873,10 @@ g = g + labs (title = rrr$Errors[1], caption = NULL) + theme_bw() +
 
 
 if(plotType == 'errors') # remove box from empty plot 
+{ 
   g = g + theme(axis.line = element_blank())
+  ddd = data.frame()
+}
 
 
 if(USEPLOTLY)
@@ -801,8 +894,8 @@ if(USEPLOTLY)
     ddd = Values
     if(!is.null(IndepVar)) ddd = cbind(ddd,IndepVar)
     if(!is.null(Tooltips)) ddd = cbind(ddd,Tooltips)
-    ddd = cbind(ddd[drawPoints,],score = outliers_scores)
-    ntt = generateNiceTooltips(ddd)
+    ddd = cbind(ddd[drawPoints,, drop=FALSE],score = outliers_scores)
+    ntt = generateNiceTooltips(as.data.frame(ddd), digits = 2,  maxRows = 3)
     
     layerScatterInScatter = 1 # first layer is scatter in scatter 
     layerScatterInBoxplot = 2 # sec layer is scatter in boxplot/density
@@ -813,6 +906,11 @@ if(USEPLOTLY)
     if(plotType %in% c('boxplot','density'))
       gply$x$data[[layerScatterInBoxplot]]$text = ntt
     
+    #extend Y-axis range slightly 
+    yrange = gply$x$layout$yaxis$range
+    if(!is.null(yrange))
+      gply$x$layout$yaxis$range = (yrange - mean(yrange))*yRangeExtend + mean(yrange)
+  
   }
   if(Sys.getenv("RSTUDIO") != "")#DEBUG
     print(gply)
@@ -823,3 +921,13 @@ if(USEPLOTLY)
 
 ############# Create and save widget ###############
 internalSaveWidget(gply, 'out.html');
+# resolve bug in plotly (margin of 40 px)
+ReadFullFileReplaceString('out.html', 'out.html', ',"padding":40,', ',"padding":0,')
+
+if(keepOutData && plotType != 'errors') 
+{
+  exportDF = as.data.frame(ddd)
+  exportDF$outliers = rrr_outliers$myOutliers
+  
+  KeepOutDataInHTML(df = exportDF, htmlFile = 'out.html', exportMethod = exportMethod, limitExportSize = limitExportSize)
+}

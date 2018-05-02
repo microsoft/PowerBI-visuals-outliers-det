@@ -64,7 +64,7 @@
         "no-exec-script": true,
         "no-function-constructor-with-string-args": true,
         "no-http-string": [true, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
-        "no-inner-html": true,
+        "no-inner-html": false,
         "no-octal-literal": true,
         "no-reserved-keywords": true,
         "no-string-based-set-immediate": true,
