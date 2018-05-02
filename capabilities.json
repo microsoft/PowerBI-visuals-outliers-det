@@ -30,16 +30,16 @@
 	"conditions": [
         {
           "Values": {
-            "max": 10
+            "max": 6
           },
           "ID": {
             "max": 1
           },
 		   "IndepVar": {
-            "max": 10
+            "max": 3
           },
 		   "Tooltips": {
-            "max": 5
+            "max": 3
           }
         }
       ],
@@ -410,10 +410,9 @@
             ]
           }
         },
-        
-        "afterTransform": {
-          "displayName": "After transform ",
-          "description": "Show after transform",
+        "googleVizScatter": {
+          "displayName": "Scatter plot alternative type",
+          "description": "Use googleViz instead of plotly for scatter plot",
           "type": {
             "bool": true
           }
@@ -426,7 +425,7 @@
           }
         }
        
-        }
+      }
       }, 
       "mySettingsMark": {
         "displayName": "Markers",

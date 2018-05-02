@@ -182,9 +182,15 @@ RemoveNonNumeric = function(df)
 }
 
 #paste tooltips together separated by <br>
-generateNiceTooltips = function(dataset)
+generateNiceTooltips = function(dataset, br = "<br>", digits = 2, maxRows = 3)
 {
-  myNames = names(dataset)
+ 
+  myNames = colnames(dataset)
+  
+  nuc = sapply(dataset,is.numeric)
+  if(sum(nuc))
+    dataset[,nuc] = round(dataset[,nuc], digits)
+  
   LMN = length(myNames)
   s = 1
   
@@ -192,15 +198,23 @@ generateNiceTooltips = function(dataset)
   dta = dataset[,s:LMN]
   niceTooltips = NULL
   
+  chunksInOneLine =  ceiling(LMN/maxRows)
+  countInLine = 0;
+  
   for (n in c(1:length(nms)))
   {
+ #   browser()
+    countInLine = countInLine + 1
+    br1 = ifelse(countInLine %% chunksInOneLine == 0, br, ';')
+      
+    
     if(length(nms) == 1)
       niceTooltips = paste(nms," = ", dta, sep = "") 
     else
     {
       niceTooltips = paste(niceTooltips,nms[n]," = ", dta[,n], sep = "")  
       if(n < length(nms))
-        niceTooltips = paste(niceTooltips,"<br>", sep = "")
+        niceTooltips = paste(niceTooltips, br1, sep = "")
     }
   }
   return(niceTooltips)

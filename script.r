@@ -12,14 +12,14 @@
 
 
 #TEMP: Debug in RStudio
-# fileRda = "C:/Users/boefraty/projects/PBI/R/tempData.Rda"
-# if(file.exists(dirname(fileRda)))
-# {
-#   if(Sys.getenv("RSTUDIO")!="")
-#     load(file= fileRda)
-#   else
-#     save(list = ls(all.names = TRUE), file=fileRda)
-# }
+fileRda = "C:/Users/boefraty/projects/PBI/R/tempData1.Rda"
+if(file.exists(dirname(fileRda)))
+{
+  if(Sys.getenv("RSTUDIO")!="")
+    load(file= fileRda)
+  else
+    save(list = ls(all.names = TRUE), file=fileRda)
+}
 
 
 
@@ -203,6 +203,12 @@ SMALL_EPSILON = 0.000001
 maxRows = 95000 # randomly remove extra rows
 maxRowsLOF = 6500 # randomly remove extra rows
 
+plotScatterWithGoogleViz = FALSE
+if(exists("mySettingsViz_googleVizScatter")){
+  plotScatterWithGoogleViz = mySettingsViz_googleVizScatter
+}
+
+
 options(warn=-1)
 ###############Library Declarations###############
 
@@ -281,10 +287,10 @@ RemoveExtraRows = function(Values,ID, IndepVar , Tooltips, algName, params)
     if(!is.null(Tooltips))
       Tooltips = Tooltips[ii, , drop=FALSE]
   }  
-    
-    return(list(Values = Values,ID = ID, IndepVar = IndepVar , Tooltips = Tooltips))
-    
-    
+  
+  return(list(Values = Values,ID = ID, IndepVar = IndepVar , Tooltips = Tooltips))
+  
+  
 }
 
 
@@ -322,10 +328,16 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
       if(!is.null(ID))
         ID = subset(ID,goodRows)
       
+      if(!is.null(Values))
+        Values = subset(Values,goodRows)
+      
+      if(!is.null(IndepVar))
+        IndepVar = subset(IndepVar,goodRows)
+      
     }
   }
   
-
+  
   #check for errors
   Errors = CheckInputForErrors(XX, YY, algName, params)
   if(is.null(Errors))
@@ -343,6 +355,10 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
         YY[,] = YY[ord,]
       if(!is.null(TT))
         TT[,] = TT[ord,]
+      if(!is.null(Values))
+        Values[,] = Values[ord,]
+      if(!is.null(IndepVar))
+        IndepVar[,] = IndepVar[ord,]
       
       ID[,1] = ID[ord,1]
     }
@@ -390,7 +406,7 @@ TransformInputData = function(Values,ID, IndepVar, Tooltips, algName, toScale, p
   }
   
   #result in list
-  res = list(XX= XX, YY = YY, TT = TT, Errors = Errors, Values = XX,ID = ID, IndepVar = YY, Tooltips = TT)
+  res = list(XX= XX, YY = YY, TT = TT, Errors = Errors, Values = Values,ID = ID, IndepVar = IndepVar, Tooltips = TT)
   return(res) 
   
 }
@@ -636,7 +652,13 @@ scaleXYformat = function (scaleType, XorY, fp)
   
 }
 
-
+#label format: hAxis.format scientific, dollar , comma
+GetGooFormat = function(scaleFormat)
+{
+  mapFormat = c('','scientific','currency', 'decimal')
+  names(mapFormat) = c('none','scientific','dollar', 'comma')
+  return(mapFormat[scaleFormat])
+}
 
 ############# Input validation & initializations ############# 
 
@@ -742,6 +764,35 @@ if(plotType == 'scatter')
           axis.text = element_text(size =  sizeTicks),
           panel.border = element_blank(), axis.line = element_line())
   
+  
+  if(plotScatterWithGoogleViz)
+  {
+    libraryRequireInstall("googleVis")
+    
+    gooDF <- data.frame(X = data4viz$X, In = data4viz$Y, In.html.tooltip= "a", Out = data4viz$Y, Out.html.tooltip= "b")
+    gooDF$In[myOutliers] = NA
+    gooDF$Out[!myOutliers] = NA
+    
+    myXformat = GetGooFormat(scaleXformat)
+    myYformat = GetGooFormat(scaleYformat)
+    
+    gooOptions=list(colors=paste("['", inlierColor,"','",outlierColor,"']", sep =""), 
+                    legend = 'none',
+                    hAxis=paste("{format:'",myXformat,"' , title:","'",rrr2$VYY_name,"',", "titleTextStyle: { color: ","'",colLabel,"'" ,",fontSize:", sizeLabel*1.5, "}","}",sep = ""),
+                    vAxis=paste("{format:'",myYformat,"' , title:","'",rrr2$VXX_name,"',", "titleTextStyle: { color: ","'",colLabel,"'" ,",fontSize:", sizeLabel*1.5, "}","}",sep = ""),
+                    pointSize = pntSize*7,
+                    dataOpacity = transparency, 
+                    fontSize = sizeTicks*1.5,
+                    tooltip = paste("{textStyle: { fontSize: ",sizeLabel*1.5,"}, showColorCode: true}",sep =""),
+                    #width=300, height=300
+                    #chartArea = "{left:20,top:20,width:'80%',height:'80%'}", 
+                    selectionMode = 'multiple'
+                    #theme = 'maximized'
+    )           
+    
+  }
+  
+  
 }
 
 if(plotType == 'boxplot')
@@ -801,8 +852,8 @@ if(USEPLOTLY)
     ddd = Values
     if(!is.null(IndepVar)) ddd = cbind(ddd,IndepVar)
     if(!is.null(Tooltips)) ddd = cbind(ddd,Tooltips)
-    ddd = cbind(ddd[drawPoints,],score = outliers_scores)
-    ntt = generateNiceTooltips(ddd)
+    ddd = cbind(ddd[drawPoints,, drop=FALSE],score = outliers_scores)
+    ntt = generateNiceTooltips(as.data.frame(ddd), digits = 2,  maxRows = 3)
     
     layerScatterInScatter = 1 # first layer is scatter in scatter 
     layerScatterInBoxplot = 2 # sec layer is scatter in boxplot/density
@@ -812,6 +863,7 @@ if(USEPLOTLY)
       gply$x$data[[layerScatterInScatter]]$text = ntt
     if(plotType %in% c('boxplot','density'))
       gply$x$data[[layerScatterInBoxplot]]$text = ntt
+    
     
   }
   if(Sys.getenv("RSTUDIO") != "")#DEBUG
@@ -823,3 +875,20 @@ if(USEPLOTLY)
 
 ############# Create and save widget ###############
 internalSaveWidget(gply, 'out.html');
+
+if(plotScatterWithGoogleViz && plotType == 'scatter')
+{
+  gooDF$In.html.tooltip = sapply(ntt, gsub, pattern = "<br>", replacement = "\\n", fixed = TRUE)
+  gooDF$Out.html.tooltip = sapply(ntt, gsub, pattern = "<br>", replacement = "\\n", fixed = TRUE)
+  
+  gvisPlot =   gvisScatterChart(gooDF, options = gooOptions)
+  gvisPlot$html$footer=""
+  gvisPlot$html$caption = ""
+  htmlstring <- paste(c(gvisPlot$html$header,paste(gvisPlot$html$chart,collapse = "\n"),gvisPlot$html$caption),collapse = "\n")
+  fname = "out.html"
+  write(htmlstring,file = fname)
+  FlattenHTML(fname, fname)
+  
+  if(Sys.getenv("RSTUDIO") != "")#DEBUG
+    plot(gvisPlot)
+}
