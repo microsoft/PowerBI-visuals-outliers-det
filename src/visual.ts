@@ -167,7 +167,6 @@ module powerbi.extensibility.visual {
                             thresholdType: se.mySettingsDet.thresholdType,
                             algName: se.mySettingsDet.algName
                         },
-                        // selector: null
                     });
                     if (se.mySettingsDet.algName == "zscore") {
                         objectEnumeration.push({
@@ -176,7 +175,6 @@ module powerbi.extensibility.visual {
                                 numSig: se.mySettingsDet.numSig,
 
                             },
-                            //   selector: null
                         });
                     }
                     if (se.mySettingsDet.algName == "manual") {
@@ -187,7 +185,6 @@ module powerbi.extensibility.visual {
                                 hThresh: se.mySettingsDet.hThresh,
 
                             },
-                            //  selector: null
                         });
                     }
                     if (se.mySettingsDet.algName == "LOF") {
@@ -197,7 +194,6 @@ module powerbi.extensibility.visual {
                                 LOFThresh: se.mySettingsDet.LOFThresh,
                                 LOFK: se.mySettingsDet.LOFK
                             },
-                            //   selector: null
                         });
                     }
                     if (se.mySettingsDet.algName == "Tukey") {
@@ -206,7 +202,6 @@ module powerbi.extensibility.visual {
                             properties: {
                                 IQR: se.mySettingsDet.IQR
                             },
-                            //   selector: null
                         });
                     }
                     if (se.mySettingsDet.algName == "cooks") {
@@ -215,7 +210,6 @@ module powerbi.extensibility.visual {
                             properties: {
                                 cooksThresh: se.mySettingsDet.cooksThresh
                             },
-                            //  selector: null
                         });
                     }
                     objectEnumeration.push({
@@ -247,7 +241,6 @@ module powerbi.extensibility.visual {
                             inlierColor: se.mySettingsMark.inlierColor,
                             outlierColor: se.mySettingsMark.outlierColor,
                             weight: se.mySettingsMark.weight,
-                            // sparsify: se.mySettingsMark.sparsify,
                             percentile: se.mySettingsMark.percentile,
 
                         },
