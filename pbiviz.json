@@ -1,15 +1,15 @@
 {
   "visual": {
     "name": "outliersDetection",
-    "displayName": "PowerBI-visuals-outliers-det-1.0.0",
+    "displayName": "PowerBI-visuals-outliers-det",
     "guid": "outliersDetection7FCA",
     "visualClassName": "Visual",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Find outliers in your data, using the most appropriate method and plot.",
     "supportUrl": "http://community.powerbi.com/",
     "gitHubUrl": "https://github.com/Microsoft/powerbi-visuals-outliers-det"
   },
-  "apiVersion": "1.10.0",
+  "apiVersion": "1.11.0",
   "author": {
     "name": "Microsoft",
     "email": "pbicvsupport@microsoft.com"

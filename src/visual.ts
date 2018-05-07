@@ -150,15 +150,10 @@ module powerbi.extensibility.visual {
         }
 
         /** 
-         * This function gets called for each of the objects defined in the capabilities files and allows you to select which of the 
+         * This function gets called for each of the objects defined in the capabilities files and allows you to select which of the
          * objects and properties you want to expose to the users in the property pane.
          * 
          */
-        // public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions):
-        //     VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-        //     return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
-        // }
-
         public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
             let objectName = options.objectName;
             let objectEnumeration = [];
@@ -166,107 +161,94 @@ module powerbi.extensibility.visual {
 
             switch (objectName) {
                 case 'mySettingsDet':
-                objectEnumeration.push({
-                    objectName: objectName,
-                    properties: {
-                        thresholdType: se.mySettingsDet.thresholdType,
-                        algName: se.mySettingsDet.algName
-                        },
-                       // selector: null
-                    });
-                if(se.mySettingsDet.algName=="zscore")
-                {
-                objectEnumeration.push({
+                    objectEnumeration.push({
                         objectName: objectName,
                         properties: {
-                            numSig: se.mySettingsDet.numSig,
-                           
+                            thresholdType: se.mySettingsDet.thresholdType,
+                            algName: se.mySettingsDet.algName
                         },
-                     //   selector: null
                     });
-                }
-                if(se.mySettingsDet.algName=="manual")
-                {
-                objectEnumeration.push({
-                        objectName: objectName,
-                        properties: {
-                            lThresh: se.mySettingsDet.lThresh,
-                            hThresh: se.mySettingsDet.hThresh,
-                            
-                        },
-                      //  selector: null
-                    });
-                }
-                if(se.mySettingsDet.algName=="LOF")
-                {
-                objectEnumeration.push({
-                        objectName: objectName,
-                        properties: {
-                            LOFThresh: se.mySettingsDet.LOFThresh,
-                            LOFK: se.mySettingsDet.LOFK
-                        },
-                     //   selector: null
-                    });
-                }
-                if(se.mySettingsDet.algName=="Tukey")
-                {
-                objectEnumeration.push({
-                        objectName: objectName,
-                        properties: {
-                            IQR: se.mySettingsDet.IQR
-                        },
-                     //   selector: null
-                    });
-                }
-                if(se.mySettingsDet.algName=="cooks")
-                {
-                objectEnumeration.push({
-                        objectName: objectName,
-                        properties: {
-                            cooksThresh: se.mySettingsDet.cooksThresh
-                        },
-                      //  selector: null
-                    });
-                }
-                objectEnumeration.push({
-                    objectName: objectName,
-                    properties: {
-                        toScale: se.mySettingsDet.toScale                     
-                    },
-                    selector: null
-                });
-                break;
+                    if (se.mySettingsDet.algName == "zscore") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                numSig: se.mySettingsDet.numSig,
 
-               
-                    case 'mySettingsViz':
-                    
+                            },
+                        });
+                    }
+                    if (se.mySettingsDet.algName == "manual") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                lThresh: se.mySettingsDet.lThresh,
+                                hThresh: se.mySettingsDet.hThresh,
+
+                            },
+                        });
+                    }
+                    if (se.mySettingsDet.algName == "LOF") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                LOFThresh: se.mySettingsDet.LOFThresh,
+                                LOFK: se.mySettingsDet.LOFK
+                            },
+                        });
+                    }
+                    if (se.mySettingsDet.algName == "Tukey") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                IQR: se.mySettingsDet.IQR
+                            },
+                        });
+                    }
+                    if (se.mySettingsDet.algName == "cooks") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                cooksThresh: se.mySettingsDet.cooksThresh
+                            },
+                        });
+                    }
+                    objectEnumeration.push({
+                        objectName: objectName,
+                        properties: {
+                            toScale: se.mySettingsDet.toScale
+                        },
+                        selector: null
+                    });
+                    break;
+
+
+                case 'mySettingsViz':
+
                     objectEnumeration.push({
                         objectName: objectName,
                         properties: {
                             plotType: se.mySettingsViz.plotType,
                             visualizeOutlierScore: se.mySettingsViz.visualizeOutlierScore
-                    
                         },
                         selector: null
                     });
                     break;
-                    case 'mySettingsMark':
-                    
+                case 'mySettingsMark':
+
                     objectEnumeration.push({
                         objectName: objectName,
                         properties: {
                             inlierColor: se.mySettingsMark.inlierColor,
                             outlierColor: se.mySettingsMark.outlierColor,
                             weight: se.mySettingsMark.weight,
-                           // sparsify: se.mySettingsMark.sparsify,
                             percentile: se.mySettingsMark.percentile,
-                    
+
                         },
                         selector: null
                     });
                     break;
-                    case 'mySettingsAxes':
-                    
+                case 'mySettingsAxes':
+
                     objectEnumeration.push({
                         objectName: objectName,
                         properties: {
@@ -276,24 +258,33 @@ module powerbi.extensibility.visual {
                         },
                         selector: null
                     });
-                    if(se.mySettingsViz.plotType == "scatter" || se.mySettingsViz.plotType == "density" )
-                    {
+                    if (se.mySettingsViz.plotType == "scatter" || se.mySettingsViz.plotType == "density") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                scaleXformat: se.mySettingsAxes.scaleXformat
+                            }
+                        });
+                    }
+                    if (se.mySettingsViz.plotType == "scatter" || se.mySettingsViz.plotType == "boxplot") {
+                        objectEnumeration.push({
+                            objectName: objectName,
+                            properties: {
+                                scaleYformat: se.mySettingsAxes.scaleYformat
+                            }
+                        });
+                    }
+                    break;
+                case 'settings_export_params':
                     objectEnumeration.push({
                         objectName: objectName,
                         properties: {
-                            scaleXformat: se.mySettingsAxes.scaleXformat
-                        }
+                            show: this.settings.settings_export_params.show,
+                            limitExportSize: this.settings.settings_export_params.limitExportSize,
+                            method: this.settings.settings_export_params.method
+                        },
+                        selector: null
                     });
-                    }
-                    if(se.mySettingsViz.plotType == "scatter" || se.mySettingsViz.plotType == "boxplot" )
-                    {
-                    objectEnumeration.push({
-                        objectName: objectName,
-                        properties: {
-                            scaleYformat: se.mySettingsAxes.scaleYformat
-                        }
-                    });
-                    }
                     break;
 
             };
